@@ -58,7 +58,7 @@ def create_m4b_from_chapters(input_dir, ebook_file, output_dir):
         try:
             cover_path = ebook_path.rsplit('.', 1)[0] + '.jpg'
             subprocess.run(['ebook-meta', ebook_path, '--get-cover', cover_path], check=True)
-            if (os.path.exists(cover_path)):
+            if os.path.exists(cover_path):
                 return cover_path
         except Exception as e:
             print(f"Error extracting eBook metadata or cover: {e}")
@@ -86,18 +86,33 @@ def create_m4b_from_chapters(input_dir, ebook_file, output_dir):
     def create_m4b(combined_wav, metadata_file, cover_image, output_m4b):
         os.makedirs(os.path.dirname(output_m4b), exist_ok=True)
         
-        ffmpeg_cmd = ['ffmpeg', '-i', combined_wav, '-i', metadata_file]
+        ffmpeg_cmd = ['ffmpeg', '-i', combined_wav]
+        
         if cover_image:
-            ffmpeg_cmd += ['-i', cover_image, '-map', '0:a', '-map', '2:v']
+            ffmpeg_cmd += ['-i', cover_image, '-map', '0:a', '-map', '1:v']
         else:
             ffmpeg_cmd += ['-map', '0:a']
         
-        ffmpeg_cmd += ['-map_metadata', '1', '-c:a', 'aac', '-b:a', '192k']
+        if metadata_file and os.path.exists(metadata_file):
+            ffmpeg_cmd += ['-i', metadata_file, '-map_metadata', '1']
+
+        ffmpeg_cmd += ['-c:a', 'aac', '-b:a', '192k']
+
         if cover_image:
             ffmpeg_cmd += ['-c:v', 'png', '-disposition:v', 'attached_pic']
+
         ffmpeg_cmd += [output_m4b]
 
-        subprocess.run(ffmpeg_cmd, check=True)
+        try:
+            subprocess.run(ffmpeg_cmd, check=True)
+            print(f"M4B created with metadata: {output_m4b}")
+        except subprocess.CalledProcessError:
+            print("Error creating M4B with metadata, trying without metadata...")
+            ffmpeg_cmd = ['ffmpeg', '-i', combined_wav, '-c:a', 'aac', '-b:a', '192k', output_m4b]
+            if cover_image:
+                ffmpeg_cmd += ['-i', cover_image, '-map', '0:a', '-map', '1:v', '-c:v', 'png', '-disposition:v', 'attached_pic']
+            subprocess.run(ffmpeg_cmd, check=True)
+            print(f"M4B created without metadata: {output_m4b}")
 
     chapter_files = sorted([os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.wav')], key=sort_key)
     temp_dir = tempfile.gettempdir()
@@ -116,6 +131,7 @@ def create_m4b_from_chapters(input_dir, ebook_file, output_dir):
         os.remove(metadata_file)
     if cover_image and os.path.exists(cover_image):
         os.remove(cover_image)
+
 
 def create_chapter_labeled_book(ebook_file_path):
     def ensure_directory(directory_path):
