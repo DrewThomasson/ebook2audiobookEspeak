@@ -97,19 +97,10 @@ Specify the language code when running the script.
 
 1. **Run the Script**:
    ```bash
-   python custom_model_ebook2audiobookXTTS_gradio.py
+   python gradio_launch.py
    ```
 
 2. **Open the Web App**: Click the URL provided in the terminal to access the web app and convert eBooks.
-
-### 📝 Basic Usage
-
-```bash
-python ebook2audiobook.py <path_to_ebook_file> [language_code]
-```
-
-- **<path_to_ebook_file>**: Path to your eBook file.
-- **[language_code]**: Optional to specify language.
 
 ## 🐳 Using Docker
 
