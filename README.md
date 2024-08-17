@@ -138,3 +138,6 @@ For more details, visit the [Docker Hub Page](https://hub.docker.com/repository/
 
 - **eSpeak-ng**: [eSpeak-ng GitHub](https://github.com/espeak-ng/espeak-ng)
 - **Calibre**: [Calibre Website](https://calibre-ebook.com)
+- **Inspiration from Smiling friends Spamtopia episode**
+  ![maxresdefault](https://github.com/user-attachments/assets/a6c34117-36d6-4b20-b8c5-b58066a867fe)
+
