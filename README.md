@@ -20,7 +20,7 @@ Convert eBooks to audiobooks with chapters and metadata using Calibre and eSpeak
 - FFmpeg (for audiobook creation)
 - eSpeak-ng (for text-to-speech)
 
-## Gradio Web Gui
+## 🖥️ Gradio Web Gui
 <img width="1405" alt="Screenshot 2024-08-17 at 4 42 16 PM" src="https://github.com/user-attachments/assets/ee8f29be-b696-4d66-81de-00c85f1f5c66">
 
 <img width="1407" alt="Screenshot 2024-08-17 at 4 42 22 PM" src="https://github.com/user-attachments/assets/7a060762-d4fc-41cc-96b2-071f33e50f0c">
