@@ -10,6 +10,7 @@ Convert eBooks to audiobooks with chapters and metadata using Calibre and eSpeak
 - 🌍 Supports multiple languages and accents.
 - 🎛️ Customizable voice, speed, and pitch settings.
 - 🖥️ User-friendly Gradio web interface.
+- ⚡ Designed to run lighting fast on only 100 MB ram.
 
 ## 🛠️ Requirements
 
