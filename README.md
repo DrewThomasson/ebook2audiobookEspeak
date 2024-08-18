@@ -96,8 +96,6 @@ eSpeak-ng provides a variety of voices for different languages and accents:
 - **Vietnamese**: `vi`
 - **Welsh**: `cy`
 
-Specify the language code when running the script.
-
 ## 🚀 Usage
 
 ### 🖥️ Gradio Web Interface
