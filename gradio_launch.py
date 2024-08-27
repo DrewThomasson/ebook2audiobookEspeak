@@ -18,7 +18,6 @@ import sys
 from nltk.tokenize import sent_tokenize
 import csv
 
-
 # Ensure necessary models are downloaded
 # nltk.download('punkt')
 
@@ -256,6 +255,11 @@ def create_chapter_labeled_book(ebook_file_path):
 
     ensure_directory(os.path.join(".", "Working_files", "Book"))
 
+def sanitize_sentence(sentence):
+    # Replace or remove problematic characters that could cause issues in any language
+    sanitized = sentence.replace('--', ' ').replace('"', '').replace("'", "")
+    return sanitized
+
 def convert_chapters_to_audio_espeak(chapters_dir, output_audio_dir, speed="170", pitch="50", voice="en"):
     if not os.path.exists(output_audio_dir):
         os.makedirs(output_audio_dir)
@@ -279,13 +283,31 @@ def convert_chapters_to_audio_espeak(chapters_dir, output_audio_dir, speed="170"
                 combined_audio = AudioSegment.empty()
 
                 for sentence in tqdm(sentences, desc=f"Chapter {chapter_num}"):
+                    success = False
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav:
-                        subprocess.run(["espeak-ng", "-v", voice, "-w", temp_wav.name, f"-s{speed}", f"-p{pitch}", sentence])
-                        combined_audio += AudioSegment.from_wav(temp_wav.name)
+                        try:
+                            subprocess.run(["espeak-ng", "-v", voice, "-w", temp_wav.name, f"-s{speed}", f"-p{pitch}", sentence], check=True)
+                            success = True
+                        except subprocess.CalledProcessError:
+                            # If it fails, try with the sanitized sentence
+                            sanitized_sentence = sanitize_sentence(sentence)
+                            try:
+                                subprocess.run(["espeak-ng", "-v", voice, "-w", temp_wav.name, f"-s{speed}", f"-p{pitch}", sanitized_sentence], check=True)
+                                success = True
+                                print(f"Sanitized sentence used for: {sentence}")
+                            except subprocess.CalledProcessError as e:
+                                print(f"Failed to convert sentence to audio: {sentence}")
+                                print(f"Error: {e}")
+
+                        if success and os.path.getsize(temp_wav.name) > 0:
+                            combined_audio += AudioSegment.from_wav(temp_wav.name)
+                        else:
+                            print(f"Skipping sentence due to failure or empty WAV: {sentence}")
                         os.remove(temp_wav.name)
 
                 combined_audio.export(output_file_path, format='wav')
                 print(f"Converted chapter {chapter_num} to audio.")
+
 
 def convert_ebook_to_audio(ebook_file, speed, pitch, voice, progress=gr.Progress()):
     ebook_file_path = ebook_file.name
