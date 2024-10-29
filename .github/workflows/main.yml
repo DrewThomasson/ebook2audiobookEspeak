@@ -1,0 +1,79 @@
+name: Test Across Multiple Systems Without sudo
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu:latest, fedora:latest, archlinux:latest, alpine:latest, opensuse/leap:latest]
+        scenario: [none, calibre, ffmpeg, both]
+    container:
+      image: ${{ matrix.os }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies (Ubuntu and Debian-based)
+        if: ${{ matrix.os == 'ubuntu:latest' }}
+        run: |
+          apt-get update
+          apt-get install -y calibre ffmpeg espeak-ng python3-pip
+          pip install gradio bs4 pydub nltk ebooklib tqdm
+          python3 -m nltk.downloader punkt
+
+      - name: Install Dependencies (Fedora)
+        if: ${{ matrix.os == 'fedora:latest' }}
+        run: |
+          dnf install -y calibre ffmpeg espeak-ng python3-pip
+          pip install gradio bs4 pydub nltk ebooklib tqdm
+          python3 -m nltk.downloader punkt
+
+      - name: Install Dependencies (Arch)
+        if: ${{ matrix.os == 'archlinux:latest' }}
+        run: |
+          pacman -Sy --noconfirm calibre ffmpeg espeak-ng python-pip
+          pip install gradio bs4 pydub nltk ebooklib tqdm
+          python -m nltk.downloader punkt
+
+      - name: Install Dependencies (Alpine)
+        if: ${{ matrix.os == 'alpine:latest' }}
+        run: |
+          apk add --no-cache bash python3 py3-pip ffmpeg espeak-ng
+          pip install gradio bs4 pydub nltk ebooklib tqdm
+          python3 -m nltk.downloader punkt
+
+      - name: Install Dependencies (openSUSE)
+        if: ${{ matrix.os == 'opensuse/leap:latest' }}
+        run: |
+          zypper install -y calibre ffmpeg espeak-ng python3-pip
+          pip install gradio bs4 pydub nltk ebooklib tqdm
+          python3 -m nltk.downloader punkt
+
+      - name: Create and Run Test Script
+        run: |
+          cat << 'EOF' > test_script.sh
+          #!/bin/bash
+          set -e
+          python3 gradio_launch.py &
+          sleep 5
+          if curl -s http://localhost:7860 | grep "Gradio"; then
+            echo "Gradio interface running successfully."
+            exit 0
+          else
+            echo "Failed to launch Gradio interface."
+            exit 1
+          fi
+          EOF
+          chmod +x test_script.sh
+          ./test_script.sh
+        shell: bash
+
