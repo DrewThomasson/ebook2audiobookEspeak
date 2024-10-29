@@ -22,44 +22,56 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Install Dependencies (Ubuntu and Debian-based)
+      - name: Install Dependencies (Ubuntu)
         if: ${{ matrix.os == 'ubuntu:latest' }}
         run: |
-          apt-get update
-          apt-get install -y calibre ffmpeg espeak-ng python3-pip
+          echo "::group::Installing Dependencies for Ubuntu"
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y calibre ffmpeg espeak-ng python3-pip -qq
           pip install gradio bs4 pydub nltk ebooklib tqdm
           python3 -m nltk.downloader punkt
+          echo "::endgroup::"
 
       - name: Install Dependencies (Fedora)
         if: ${{ matrix.os == 'fedora:latest' }}
         run: |
-          dnf install -y calibre ffmpeg espeak-ng python3-pip
+          echo "::group::Installing Dependencies for Fedora"
+          dnf install -y calibre ffmpeg espeak-ng python3-pip -q
           pip install gradio bs4 pydub nltk ebooklib tqdm
           python3 -m nltk.downloader punkt
+          echo "::endgroup::"
 
       - name: Install Dependencies (Arch)
         if: ${{ matrix.os == 'archlinux:latest' }}
         run: |
+          echo "::group::Installing Dependencies for Arch"
           pacman -Sy --noconfirm calibre ffmpeg espeak-ng python-pip
           pip install gradio bs4 pydub nltk ebooklib tqdm
           python -m nltk.downloader punkt
+          echo "::endgroup::"
 
       - name: Install Dependencies (Alpine)
         if: ${{ matrix.os == 'alpine:latest' }}
         run: |
+          echo "::group::Installing Dependencies for Alpine"
           apk add --no-cache bash python3 py3-pip ffmpeg espeak-ng
           pip install gradio bs4 pydub nltk ebooklib tqdm
           python3 -m nltk.downloader punkt
+          echo "::endgroup::"
 
       - name: Install Dependencies (openSUSE)
         if: ${{ matrix.os == 'opensuse/leap:latest' }}
         run: |
+          echo "::group::Installing Dependencies for openSUSE"
           zypper install -y calibre ffmpeg espeak-ng python3-pip
           pip install gradio bs4 pydub nltk ebooklib tqdm
           python3 -m nltk.downloader punkt
+          echo "::endgroup::"
 
       - name: Create and Run Test Script
         run: |
+          echo "::group::Running Test Script"
           cat << 'EOF' > test_script.sh
           #!/bin/bash
           set -e
@@ -75,5 +87,5 @@ jobs:
           EOF
           chmod +x test_script.sh
           ./test_script.sh
+          echo "::endgroup::"
         shell: bash
-
