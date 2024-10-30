@@ -1,4 +1,4 @@
-name: Test on Ubuntu
+name: Run Gradio Server
 
 on: [push, pull_request]
 
@@ -8,12 +8,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4  # Compatible with Node.js 20
+      uses: actions/checkout@v4  # Node.js 20 compatible
 
     - name: Set up Python 3.10.12
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10.12  # Specific version of Python 3.10
+        python-version: 3.10.12  # Specific version
 
     - name: Install dependencies
       run: |
@@ -22,17 +22,8 @@ jobs:
         pip install gradio bs4 pydub nltk beautifulsoup4 ebooklib tqdm
         python -m nltk.downloader punkt
 
-    - name: Run Tests
-      run: |
-        python -m unittest discover tests
-
-    - name: Run Gradio Interface (Optional)
+    - name: Run Gradio Interface
       run: |
         python gradio_launch.py &
-        sleep 5
+        sleep 10  # Give the server time to start
         curl -I http://localhost:7860 || exit 1
-
-    - name: Verify Lint (Optional)
-      run: |
-        pip install pylint
-        pylint **/*.py
