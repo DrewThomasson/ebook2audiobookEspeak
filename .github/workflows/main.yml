@@ -8,12 +8,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4  # Updated to use the latest version
+      uses: actions/checkout@v4  # Compatible with Node.js 20
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.10.12
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10
+        python-version: 3.10.12  # Specific version of Python 3.10
 
     - name: Install dependencies
       run: |
