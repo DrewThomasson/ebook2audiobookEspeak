@@ -1,0 +1,7 @@
+calibre
+espeak-ng
+lame 
+vorbis-tools
+wget
+build-essential
+ffmpeg
