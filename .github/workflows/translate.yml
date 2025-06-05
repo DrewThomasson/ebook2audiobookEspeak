@@ -1,0 +1,8 @@
+            - name: Readme Translate
+  # You may pin to the exact commit or the version.
+  # uses: InProgres/translate-readme@2f69b9f475c1f039788d3564f147b21b2eb0e7b7
+  uses: InProgres/translate-readme@v2.3
+  with:
+    # The Language you want to translate to in JSON format
+    LANG: # default is ['ru', 'uk']
+          
